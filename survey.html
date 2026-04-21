@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RIGOR Expert Evaluation — all_databases</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f7f8fa;
+  --card: #ffffff;
+  --border: #e2e5ea;
+  --text: #1a1d23;
+  --text-secondary: #5f6672;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --accent-a: #7c3aed;
+  --accent-b: #0891b2;
+  --accent-c: #c2410c;
+  --accent-d: #059669;
+  --code-bg: #f1f3f5;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+body {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 40px 24px 32px;
+  margin-bottom: 32px;
+}
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.header p {
+  color: var(--text-secondary);
+  font-size: 15px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Progress */
+.progress-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+}
+.progress-bar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.progress-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Welcome screen */
+.welcome-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: var(--shadow);
+  max-width: 640px;
+  margin: 0 auto;
+}
+.welcome-card h2 { font-size: 22px; margin-bottom: 16px; }
+.welcome-card p { margin-bottom: 12px; color: var(--text-secondary); font-size: 14px; }
+.welcome-card ul { margin: 12px 0 20px 20px; font-size: 14px; color: var(--text-secondary); }
+.welcome-card li { margin-bottom: 6px; }
+.welcome-card input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 15px;
+  margin-bottom: 16px;
+  font-family: inherit;
+}
+.welcome-card input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+/* Table screen */
+.table-screen { display: none; }
+.table-screen.active { display: block; }
+
+.context-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.context-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.context-card pre {
+  background: var(--code-bg);
+  padding: 14px;
+  border-radius: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+/* Method grid */
+.methods-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+  .methods-grid { grid-template-columns: 1fr; }
+}
+
+.method-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.method-header {
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 15px;
+  color: white;
+}
+.method-card:nth-child(1) .method-header { background: var(--accent-a); }
+.method-card:nth-child(2) .method-header { background: var(--accent-b); }
+.method-card:nth-child(3) .method-header { background: var(--accent-c); }
+.method-card:nth-child(4) .method-header { background: var(--accent-d); }
+
+.method-body {
+  padding: 16px;
+}
+.method-body pre {
+  background: var(--code-bg);
+  padding: 12px;
+  border-radius: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  line-height: 1.4;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Scoring */
+.scoring-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.scoring-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.dim-row {
+  display: grid;
+  grid-template-columns: 180px repeat(4, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.dim-row:last-child { border-bottom: none; }
+.dim-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+.dim-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+.score-select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+  cursor: pointer;
+}
+.score-select:focus { outline: none; border-color: var(--primary); }
+.method-col-header {
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  padding: 4px;
+  border-radius: 6px;
+  color: white;
+}
+.mch-a { background: var(--accent-a); }
+.mch-b { background: var(--accent-b); }
+.mch-c { background: var(--accent-c); }
+.mch-d { background: var(--accent-d); }
+
+/* Ranking */
+.ranking-row {
+  display: grid;
+  grid-template-columns: 180px repeat(4, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 12px 0;
+}
+.rank-select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+}
+
+/* Feedback */
+.feedback-area {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  min-height: 80px;
+  resize: vertical;
+  margin-top: 8px;
+}
+.feedback-area:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+/* Buttons */
+.btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.btn-secondary {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--bg); }
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+.btn-success:hover { opacity: 0.9; }
+
+.btn-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+/* Done screen */
+.done-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 48px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  max-width: 640px;
+  margin: 0 auto;
+}
+.done-card h2 { font-size: 24px; margin-bottom: 12px; color: var(--success); }
+.done-card p { color: var(--text-secondary); margin-bottom: 24px; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="container" id="app">
+
+  <!-- WELCOME -->
+  <div id="welcome">
+    <div class="header">
+      <h1>Ontology Quality Evaluation</h1>
+      <p>Evaluate ontology fragments generated from a relational database schema. For each table, you will see four anonymised ontology fragments and score them on seven quality dimensions.</p>
+    </div>
+    <div class="welcome-card">
+      <h2>Before you begin</h2>
+      <ul>
+        <li>You will evaluate <strong id="n-tables">4</strong> tables (from two databases), each with 4 ontology fragments shown side-by-side.</li>
+        <li>Fragments are labelled <strong>A, B, C, D</strong> — method names are hidden.</li>
+        <li>For each table, score each fragment (0–5) on 7 quality dimensions, rank them 1st–4th, and optionally leave comments.</li>
+        <li>Estimated time: <strong>10–15 minutes</strong>.</li>
+        <li>At the end, download your results as a JSON file and return it to the study coordinator.</li>
+      </ul>
+      <p style="font-weight:600; margin-bottom:8px;">Your details</p>
+      <input type="text" id="expert-name" placeholder="Name or identifier (e.g., Expert_1)">
+      <input type="text" id="expert-role" placeholder="Role (e.g., Knowledge Engineer, Clinician)">
+      <input type="number" id="expert-years" placeholder="Years of experience in ontology/KG work" min="0" max="50">
+      <br>
+      <button class="btn btn-primary" onclick="startSurvey()">Start Evaluation</button>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="progress-section" class="progress-wrap hidden">
+    <div class="progress-text">Table <span id="current-idx">1</span> of <span id="total-idx">4</span> — <span id="current-db-name"></span>: <span id="current-table-name"></span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:20%"></div></div>
+  </div>
+
+  <!-- TABLE SCREENS (generated by JS) -->
+  <div id="screens-container"></div>
+
+  <!-- DONE -->
+  <div id="done-screen" class="hidden">
+    <div class="done-card">
+      <h2>Thank you!</h2>
+      <p>Your evaluation is complete. Please download the results file and send it to the study coordinator.</p>
+      <button class="btn btn-success" onclick="downloadResults()" style="font-size:16px; padding: 14px 32px;">
+        Download Results (JSON)
+      </button>
+      <p style="margin-top:16px; font-size:13px; color: var(--text-secondary);">
+        File: <span id="filename-preview"></span>
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// =========================================================
+// SURVEY DATA (embedded by generator script)
+// =========================================================
+const SURVEY_DATA = {
+  "database": "all",
+  "tables": [
+    {
+      "table_name": "chemotherapy",
+      "database": "real_world",
+      "schema": "Table: chemotherapy\nColumns:\n  id: INTEGER\n  patient_id: INTEGER\n  created_at: TIMESTAMP\n  radiotherapy: TINYINT\n  radiation_amount_in_gray: FLOAT\n  chemotherapy: TINYINT\n  number_of_cycles: INTEGER\n  five_fluorouracil: TINYINT\n  capecitabine: TINYINT\n  oxaliplatin: TINYINT\n  cisplatin: TINYINT\n  epirubicin: TINYINT\n  leucovorin: TINYINT\n  doxorubicin: TINYINT\n  sorafenib: TINYINT\n  gemcitabine: TINYINT\n  irinotecan: TINYINT\n  docetaxel: TINYINT\n  paclitaxel: TINYINT\n  carboplatin: TINYINT\n  folic_acid: TINYINT\n  other_chemotherapeutics_i: TEXT\n  other_chemotherapeutics_ii: TEXT\n  other_chemotherapeutics_iii: TEXT\n  specific_antibodies: TINYINT\n  specific_antibodies_text: TEXT\n  tace: TINYINT\n  rfa: TINYINT\n  tace_cycles: INTEGER\n  rfa_cycles: INTEGER\n  photodynamic_therapy: TINYINT\n  pdt_cycles: INTEGER\n  stable_course: TINYINT\n  progression: TINYINT\n  regression: TINYINT\n  remission: TINYINT\n  tumor_board_decision: TINYINT\n  recommendations_tumor_board: TEXT\n  implementation_tumor_board: TINYINT\n  dose_according_to_bsa: TINYINT\n  primary_dose_reduction: TINYINT\n  dose_reduction_over_time: TINYINT\n  side_effects_of_cx: TINYINT\n  emesis: TINYINT\n  diarrhea: TINYINT\n  alopecia: TINYINT\n  hand_foot_syndrome: TINYINT\n  bm_depression: TINYINT\n  neurotoxicity: TINYINT\n  ototoxicity: TINYINT\n  ps_deterioration: TINYINT\n  other_side_effects: TINYINT\n  other_side_effects_text: TEXT\n  ecog_stage: INTEGER\n  karnofsky_index_percent: INTEGER\n  her_2_status: INTEGER\n  microsatellites: INTEGER\n  implementation_of_chemotherapy_uncertain: TINYINT\n  chemoterapy_neoadjuvant: TINYINT\n  chemoterapy_adjuvant: TINYINT\n  chemoterapy_palliativ: TINYINT",
+      "cqs": "[Which treatment modalities were recorded for a patient at a given chemotherapy record, such as chemotherapy, radiotherapy, TACE, RFA, or photodynamic therapy?]\n\nThe ontology would answer this by retrieving a specific chemotherapy entry for the patient and returning the treatment-modality indicators documented in that record.\n\n---\n\n[Which systemic agents or other chemotherapeutics were documented for a given chemotherapy record?]\n\nThe ontology would answer this by examining the drug-specific fields such as five_fluorouracil, capecitabine, oxaliplatin, cisplatin, gemcitabine, irinotecan, paclitaxel, carboplatin, and the free-text other_chemotherapeutics fields in the selected record.\n\n---\n\n[Which patients received radiotherapy, and what radiation dose in gray was documented for the corresponding treatment record?]\n\nThe ontology would answer this by retrieving chemotherapy records where radiotherapy = 1 and returning the linked patients together with radiation_amount_in_gray.\n\n---\n\n[What treatment intent or treatment context was documented for a chemotherapy record, such as neoadjuvant, adjuvant, or palliative therapy?]\n\nThe ontology would answer this by retrieving the selected chemotherapy entry and interpreting the chemoterapy_neoadjuvant, chemoterapy_adjuvant, and chemoterapy_palliativ fields together with related recommendation text.\n\n---\n\n[What treatment response, performance status, and side effects were documented for a chemotherapy record?]\n\nThe ontology would answer this by retrieving the selected chemotherapy entry and returning response-related fields such as stable_course, progression, regression, remission, together with ecog_stage, karnofsky_index_percent, and side-effect indicators including any free-text notes.",
+      "chunks": {
+        "A": "Class: Chemotherapy\n  DataProperty: alopecia -> xsd:boolean\n  DataProperty: bm_depression -> xsd:boolean\n  DataProperty: capecitabine -> xsd:boolean\n  DataProperty: carboplatin -> xsd:boolean\n  DataProperty: chemoterapy_adjuvant -> xsd:boolean\n  DataProperty: chemoterapy_neoadjuvant -> xsd:boolean\n  DataProperty: chemoterapy_palliativ -> xsd:boolean\n  DataProperty: chemotherapy -> xsd:boolean\n  DataProperty: cisplatin -> xsd:boolean\n  DataProperty: created_at -> xsd:dateTime\n  DataProperty: diarrhea -> xsd:boolean\n  DataProperty: docetaxel -> xsd:boolean\n  DataProperty: dose_according_to_bsa -> xsd:boolean\n  DataProperty: dose_reduction_over_time -> xsd:boolean\n  DataProperty: doxorubicin -> xsd:boolean\n  DataProperty: ecog_stage -> xsd:integer\n  DataProperty: emesis -> xsd:boolean\n  DataProperty: epirubicin -> xsd:boolean\n  DataProperty: five_fluorouracil -> xsd:boolean\n  DataProperty: folic_acid -> xsd:boolean\n  DataProperty: gemcitabine -> xsd:boolean\n  DataProperty: hand_foot_syndrome -> xsd:boolean\n  DataProperty: her_2_status -> xsd:integer\n  DataProperty: implementation_of_chemotherapy_uncertain -> xsd:boolean\n  DataProperty: implementation_tumor_board -> xsd:boolean\n  DataProperty: irinotecan -> xsd:boolean\n  DataProperty: karnofsky_index_percent -> xsd:integer\n  DataProperty: leucovorin -> xsd:boolean\n  DataProperty: microsatellites -> xsd:integer\n  DataProperty: neurotoxicity -> xsd:boolean\n  DataProperty: number_of_cycles -> xsd:integer\n  DataProperty: other_chemotherapeutics_i -> xsd:string\n  DataProperty: other_chemotherapeutics_ii -> xsd:string\n  DataProperty: other_chemotherapeutics_iii -> xsd:string\n  DataProperty: other_side_effects -> xsd:boolean\n  DataProperty: other_side_effects_text -> xsd:string\n  DataProperty: ototoxicity -> xsd:boolean\n  DataProperty: oxaliplatin -> xsd:boolean\n  DataProperty: paclitaxel -> xsd:boolean\n  DataProperty: patient_id -> xsd:integer\n  DataProperty: pdt_cycles -> xsd:integer\n  DataProperty: photodynamic_therapy -> xsd:boolean\n  DataProperty: primary_dose_reduction -> xsd:boolean\n  DataProperty: progression -> xsd:boolean\n  DataProperty: ps_deterioration -> xsd:boolean\n  DataProperty: radiation_amount_in_gray -> xsd:float\n  DataProperty: radiotherapy -> xsd:boolean\n  DataProperty: recommendations_tumor_board -> xsd:string\n  DataProperty: regression -> xsd:boolean\n  DataProperty: remission -> xsd:boolean\n  DataProperty: rfa -> xsd:boolean\n  DataProperty: rfa_cycles -> xsd:integer\n  DataProperty: side_effects_of_cx -> xsd:boolean\n  DataProperty: sorafenib -> xsd:boolean\n  DataProperty: specific_antibodies -> xsd:boolean\n  DataProperty: specific_antibodies_text -> xsd:string\n  DataProperty: stable_course -> xsd:boolean\n  DataProperty: tace -> xsd:boolean\n  DataProperty: tace_cycles -> xsd:integer\n  DataProperty: tumor_board_decision -> xsd:boolean",
+        "B": "Class: Chemotherapy\n  DataProperty: hasAlopecia -> boolean\n  DataProperty: hasBmDepression -> boolean\n  DataProperty: hasCapecitabine -> boolean\n  DataProperty: hasCarboplatin -> boolean\n  DataProperty: hasChemoterapyAdjuvant -> boolean\n  DataProperty: hasChemoterapyNeoadjuvant -> boolean\n  DataProperty: hasChemoterapyPalliativ -> boolean\n  DataProperty: hasChemotherapy -> boolean\n  DataProperty: hasCisplatin -> boolean\n  DataProperty: hasCreatedAt -> dateTime\n  DataProperty: hasDiarrhea -> boolean\n  DataProperty: hasDocetaxel -> boolean\n  DataProperty: hasDoseAccordingToBsa -> boolean\n  DataProperty: hasDoseReductionOverTime -> boolean\n  DataProperty: hasDoxorubicin -> boolean\n  DataProperty: hasEcogStage -> integer\n  DataProperty: hasEmesis -> boolean\n  DataProperty: hasEpirubicin -> boolean\n  DataProperty: hasFiveFluorouracil -> boolean\n  DataProperty: hasFolicAcid -> boolean\n  DataProperty: hasGemcitabine -> boolean\n  DataProperty: hasHandFootSyndrome -> boolean\n  DataProperty: hasHer2Status -> integer\n  DataProperty: hasId -> integer\n  DataProperty: hasImplementationOfChemotherapyUncertain -> boolean\n  DataProperty: hasImplementationTumorBoard -> boolean\n  DataProperty: hasIrinotecan -> boolean\n  DataProperty: hasKarnofskyIndexPercent -> integer\n  DataProperty: hasLeucovorin -> boolean\n  DataProperty: hasMicrosatellites -> integer\n  DataProperty: hasNeurotoxicity -> boolean\n  DataProperty: hasNumberOfCycles -> integer\n  DataProperty: hasOtherChemotherapeuticsI -> string\n  DataProperty: hasOtherChemotherapeuticsII -> string\n  DataProperty: hasOtherChemotherapeuticsIII -> string\n  DataProperty: hasOtherSideEffects -> boolean\n  DataProperty: hasOtherSideEffectsText -> string\n  DataProperty: hasOtotoxicity -> boolean\n  DataProperty: hasOxaliplatin -> boolean\n  DataProperty: hasPaclitaxel -> boolean\n  DataProperty: hasPatientId -> integer\n  DataProperty: hasPdtCycles -> integer\n  DataProperty: hasPhotodynamicTherapy -> boolean\n  DataProperty: hasPrimaryDoseReduction -> boolean\n  DataProperty: hasProgression -> boolean\n  DataProperty: hasPsDeterioration -> boolean\n  DataProperty: hasRadiationAmountInGray -> float\n  DataProperty: hasRadiotherapy -> boolean\n  DataProperty: hasRecommendationsTumorBoard -> string\n  DataProperty: hasRegression -> boolean\n  DataProperty: hasRemission -> boolean\n  DataProperty: hasRfa -> boolean\n  DataProperty: hasRfaCycles -> integer\n  DataProperty: hasSideEffectsOfCx -> boolean\n  DataProperty: hasSorafenib -> boolean\n  DataProperty: hasSpecificAntibodies -> boolean\n  DataProperty: hasSpecificAntibodiesText -> string\n  DataProperty: hasStableCourse -> boolean\n  DataProperty: hasTace -> boolean\n  DataProperty: hasTaceCycles -> integer\n  DataProperty: hasTumorBoardDecision -> boolean",
+        "C": "Class: Chemotherapy\n  ObjectProperty: hasPatient -> Patient, patient_data, PatientData  [label: \"has patient\"]  [comment: \"Links a histology general record to a patient data record.\"]",
+        "D": "Class: Chemotherapy\n  Label: Chemotherapy Treatment\n  Comment: Represents a chemotherapy treatment regimen for a patient, including details such as radiotherapy, chemotherapy drugs, and treatment outcomes.\n  DataProperty: alopecia -> boolean  [label: \"Alopecia\"]  [comment: \"Indicates whether hair loss was experienced as a side effect.\"]\n  DataProperty: bm_depression -> boolean  [label: \"Bone Marrow Depression\"]  [comment: \"Indicates whether bone marrow depression was experienced as a side effect.\"]\n  DataProperty: capecitabine -> boolean  [label: \"Capecitabine\"]  [comment: \"Indicates whether Capecitabine was used in the chemotherapy regimen.\"]\n  DataProperty: carboplatin -> boolean  [label: \"Carboplatin\"]  [comment: \"Indicates whether Carboplatin was used in the chemotherapy regimen.\"]\n  DataProperty: chemoterapy_adjuvant -> boolean  [label: \"Adjuvant Chemotherapy\"]  [comment: \"Indicates whether adjuvant chemotherapy was administered after the main treatmen\"]\n  DataProperty: chemoterapy_neoadjuvant -> boolean  [label: \"Neoadjuvant Chemotherapy\"]  [comment: \"Indicates whether neoadjuvant chemotherapy was administered before the main trea\"]\n  DataProperty: chemoterapy_palliativ -> boolean  [label: \"Palliative Chemotherapy\"]  [comment: \"Indicates whether palliative chemotherapy was administered to relieve symptoms a\"]\n  DataProperty: chemotherapy -> boolean  [label: \"Chemotherapy\"]  [comment: \"Indicates whether chemotherapy was part of the treatment plan.\"]\n  DataProperty: cisplatin -> boolean  [label: \"Cisplatin\"]  [comment: \"Indicates whether Cisplatin was used in the chemotherapy regimen.\"]\n  DataProperty: created_at -> dateTime  [label: \"Creation Date and Time\"]  [comment: \"The date and time when the chemotherapy record was created.\"]\n  DataProperty: diarrhea -> boolean  [label: \"Diarrhea\"]  [comment: \"Indicates whether diarrhea was experienced as a side effect.\"]\n  DataProperty: docetaxel -> boolean  [label: \"Docetaxel\"]  [comment: \"Indicates whether Docetaxel was used in the chemotherapy regimen.\"]\n  DataProperty: dose_according_to_bsa -> boolean  [label: \"Dose According to BSA\"]  [comment: \"Indicates whether the dose was calculated based on body surface area (BSA).\"]\n  DataProperty: dose_reduction_over_time -> boolean  [label: \"Dose Reduction Over Time\"]  [comment: \"Indicates whether dose reductions were made during the treatment course.\"]\n  DataProperty: doxorubicin -> boolean  [label: \"Doxorubicin\"]  [comment: \"Indicates whether Doxorubicin was used in the chemotherapy regimen.\"]\n  DataProperty: ecog_stage -> integer  [label: \"ECOG Stage\"]  [comment: \"Eastern Cooperative Oncology Group (ECOG) performance status, which measures the\"]\n  DataProperty: emesis -> boolean  [label: \"Emesis\"]  [comment: \"Indicates whether vomiting was experienced as a side effect.\"]\n  DataProperty: epirubicin -> boolean  [label: \"Epirubicin\"]  [comment: \"Indicates whether Epirubicin was used in the chemotherapy regimen.\"]\n  DataProperty: five_fluorouracil -> boolean  [label: \"5-Fluorouracil\"]  [comment: \"Indicates whether 5-Fluorouracil was used in the chemotherapy regimen.\"]\n  DataProperty: folic_acid -> boolean  [label: \"Folic Acid\"]  [comment: \"Indicates whether Folic Acid was used in the chemotherapy regimen.\"]\n  DataProperty: gemcitabine -> boolean  [label: \"Gemcitabine\"]  [comment: \"Indicates whether Gemcitabine was used in the chemotherapy regimen.\"]\n  DataProperty: hand_foot_syndrome -> boolean  [label: \"Hand-Foot Syndrome\"]  [comment: \"Indicates whether hand-foot syndrome was experienced as a side effect.\"]\n  DataProperty: her_2_status -> integer  [label: \"HER-2 Status\"]  [comment: \"Human epidermal growth factor receptor 2 (HER-2) status, often used in breast ca\"]\n  DataProperty: implementation_of_chemotherapy_uncertain -> boolean  [label: \"Implementation of Chemotherapy Uncertain\"]  [comment: \"Indicates whether the implementation of chemotherapy is uncertain.\"]\n  DataProperty: implementation_tumor_board -> boolean  [label: \"Implementation of Tumor Board Decisions\"]  [comment: \"Indicates whether the tumor board's decisions were implemented.\"]\n  DataProperty: irinotecan -> boolean  [label: \"Irinotecan\"]  [comment: \"Indicates whether Irinotecan was used in the chemotherapy regimen.\"]\n  DataProperty: karnofsky_index_percent -> integer  [label: \"Karnofsky Index Percent\"]  [comment: \"Karnofsky Performance Scale, a percentage-based score assessing the patient\u2019s fu\"]\n  DataProperty: leucovorin -> boolean  [label: \"Leucovorin\"]  [comment: \"Indicates whether Leucovorin was used in the chemotherapy regimen.\"]\n  DataProperty: microsatellites -> integer  [label: \"Microsatellites\"]  [comment: \"Microsatellite instability status, indicating genetic instability. Values typica\"]\n  DataProperty: neurotoxicity -> boolean  [label: \"Neurotoxicity\"]  [comment: \"Indicates whether neurological toxicity was experienced as a side effect.\"]\n  DataProperty: number_of_cycles -> integer  [label: \"Number of Cycles\"]  [comment: \"The number of treatment cycles administered.\"]\n  DataProperty: other_chemotherapeutics_i -> string  [label: \"Other Chemotherapeutics I\"]  [comment: \"Other unspecified chemotherapy agents used in the regimen.\"]\n  DataProperty: other_chemotherapeutics_ii -> string  [label: \"Other Chemotherapeutics II\"]  [comment: \"Other unspecified chemotherapy agents used in the regimen.\"]\n  DataProperty: other_chemotherapeutics_iii -> string  [label: \"Other Chemotherapeutics III\"]  [comment: \"Other unspecified chemotherapy agents used in the regimen.\"]\n  DataProperty: other_side_effects -> boolean  [label: \"Other Side Effects\"]  [comment: \"Indicates whether other unspecified side effects were experienced.\"]\n  DataProperty: other_side_effects_text -> string  [label: \"Other Side Effects Text\"]  [comment: \"Text field for specifying additional side effects.\"]\n  DataProperty: ototoxicity -> boolean  [label: \"Ototoxicity\"]  [comment: \"Indicates whether ototoxicity was experienced as a side effect.\"]\n  DataProperty: oxaliplatin -> boolean  [label: \"Oxaliplatin\"]  [comment: \"Indicates whether Oxaliplatin was used in the chemotherapy regimen.\"]\n  DataProperty: paclitaxel -> boolean  [label: \"Paclitaxel\"]  [comment: \"Indicates whether Paclitaxel was used in the chemotherapy regimen.\"]\n  DataProperty: patient_id -> integer  [label: \"Patient ID\"]  [comment: \"The unique identifier for the patient.\"]\n  DataProperty: pdt_cycles -> integer  [label: \"PDT Cycles\"]  [comment: \"The number of PDT cycles administered.\"]\n  DataProperty: photodynamic_therapy -> boolean  [label: \"Photodynamic Therapy (PDT)\"]  [comment: \"Indicates whether Photodynamic Therapy (PDT) was used in the treatment.\"]\n  DataProperty: primary_dose_reduction -> boolean  [label: \"Primary Dose Reduction\"]  [comment: \"Indicates whether an initial reduction in the prescribed dose was made.\"]\n  DataProperty: progression -> boolean  [label: \"Progression\"]  [comment: \"Indicates whether the disease progressed.\"]\n  DataProperty: ps_deterioration -> boolean  [label: \"Performance Status Deterioration\"]  [comment: \"Indicates whether there was a general deterioration in the patient's condition.\"]\n  DataProperty: radiation_amount_in_gray -> float  [label: \"Radiation Amount in Gray\"]  [comment: \"The amount of radiation administered, measured in grays.\"]\n  DataProperty: radiotherapy -> boolean  [label: \"Radiotherapy\"]  [comment: \"Indicates whether radiotherapy was part of the treatment plan.\"]\n  DataProperty: recommendations_tumor_board -> string  [label: \"Recommendations from Tumor Board\"]  [comment: \"Recommendations made by the tumor board.\"]\n  DataProperty: regression -> boolean  [label: \"Regression\"]  [comment: \"Indicates whether the tumor regressed in response to treatment.\"]\n  DataProperty: remission -> boolean  [label: \"Remission\"]  [comment: \"Indicates whether the patient achieved remission, with complete or partial disap\"]\n  DataProperty: rfa -> boolean  [label: \"Radiofrequency Ablation (RFA)\"]  [comment: \"Indicates whether Radiofrequency Ablation (RFA) was used in the treatment.\"]\n  DataProperty: rfa_cycles -> integer  [label: \"RFA Cycles\"]  [comment: \"The number of RFA cycles administered.\"]\n  DataProperty: side_effects_of_cx -> boolean  [label: \"Side Effects of Chemotherapy\"]  [comment: \"Indicates whether side effects of chemotherapy were experienced.\"]\n  DataProperty: sorafenib -> boolean  [label: \"Sorafenib\"]  [comment: \"Indicates whether Sorafenib was used in the chemotherapy regimen.\"]\n  DataProperty: specific_antibodies -> boolean  [label: \"Specific Antibodies\"]  [comment: \"Indicates whether specific antibodies were used in the treatment.\"]\n  DataProperty: specific_antibodies_text -> string  [label: \"Specific Antibodies Text\"]  [comment: \"Text field for specifying the specific antibodies used.\"]\n  DataProperty: stable_course -> boolean  [label: \"Stable Course\"]  [comment: \"Indicates whether the disease course was stable with no progression or shrinkage\"]\n  DataProperty: tace -> boolean  [label: \"Transarterial Chemoembolization (TACE)\"]  [comment: \"Indicates whether Transarterial Chemoembolization (TACE) was used in the treatme\"]\n  DataProperty: tace_cycles -> integer  [label: \"TACE Cycles\"]  [comment: \"The number of TACE cycles administered.\"]\n  DataProperty: tumor_board_decision -> boolean  [label: \"Tumor Board Decision\"]  [comment: \"Indicates whether a decision was made by the tumor board.\"]"
+      }
+    },
+    {
+      "table_name": "patient_data",
+      "database": "real_world",
+      "schema": "Table: patient_data\nColumns:\n  patient_id: INTEGER\n  patient_id_old: INTEGER\n  created_at: TIMESTAMP\n  sex: INTEGER\n  age_at_surgery: INTEGER\nForeign Keys:\n  sex -> sex.sex_id",
+      "cqs": "[What sex category and age at surgery are recorded for a given patient?]\n\nThe ontology would answer this by retrieving the patient's patient_data record, linking the sex field to the sex table, and returning both the human-readable sex category and age_at_surgery.\n\n---\n\n[Which patients belong to a given sex category, such as weiblich, m\u00e4nnlich, or divers?]\n\nThe ontology would answer this by linking patient_data.sex to sex.sex_id and retrieving all patient_data records associated with the selected sex category.\n\n---\n\n[What is the relationship between a patient's current identifier and old identifier?]\n\nThe ontology would answer this by using the patient_data record to relate patient_id to patient_id_old as alternative identifiers for the same patient entity.\n\n---\n\n[Which patients were 60 years or older at the time of surgery, and what sex category was recorded for them?]\n\nThe ontology would answer this by filtering patient_data records on age_at_surgery >= 60 and linking each record to the referenced sex classification.\n\n---\n\n[When was a patient's demographic record created, and what demographic attributes were recorded in that record?]\n\nThe ontology would answer this by retrieving the patient_data entry for the given patient and returning created_at together with age_at_surgery and the linked sex category.",
+      "chunks": {
+        "A": "Class: PatientData\n  DataProperty: age_at_surgery -> xsd:integer\n  DataProperty: created_at -> xsd:dateTime\n  DataProperty: patient_id_old -> xsd:integer\n  ObjectProperty: hasSex -> Sex",
+        "B": "Class: PatientData\n  DataProperty: hasAgeAtSurgery -> integer\n  DataProperty: hasCreatedAt -> dateTime\n  DataProperty: hasPatientId -> integer\n  DataProperty: hasPatientIdOld -> integer\n  DataProperty: hasSex -> integer",
+        "C": "Class: PatientData\n  ObjectProperty: hasSex -> Sex  [label: \"has creation date\"]  [comment: \"Links a patient data entry to the sex of the patient\"]",
+        "D": "Class: PatientData\n  Label: Patient data\n  Comment: Data related to a patient, including demographic and clinical information.\n  DataProperty: age_at_surgery -> integer  [label: \"age at surgery\"]  [comment: \"The age of the patient at the time of surgery.\"]\n  DataProperty: created_at -> dateTime  [label: \"Creation Date and Time\"]  [comment: \"The date and time when the chemotherapy record was created.\"]\n  DataProperty: patient_id -> integer  [label: \"Patient ID\"]  [comment: \"The unique identifier for the patient.\"]\n  DataProperty: patient_id_old -> integer  [label: \"old patient ID\"]  [comment: \"The old patient ID.\"]\n  ObjectProperty: hasSex -> Sex  [label: \"has sex\"]  [comment: \"The sex of the patient.\"]"
+      }
+    },
+    {
+      "table_name": "patient",
+      "database": "eicu_crd",
+      "schema": "Table: patient\nColumns:\n  patientunitstayid: INTEGER\n  patienthealthsystemstayid: INTEGER\n  gender: VARCHAR(25)\n  age: VARCHAR(10)\n  ethnicity: VARCHAR(50)\n  hospitalid: INTEGER\n  wardid: INTEGER\n  apacheadmissiondx: VARCHAR(1000)\n  admissionheight: DECIMAL(10, 2)\n  hospitaladmittime24: VARCHAR(8)\n  hospitaladmitoffset: INTEGER\n  hospitaladmitsource: VARCHAR(30)\n  hospitaldischargeyear: SMALLINT\n  hospitaldischargetime24: VARCHAR(8)\n  hospitaldischargeoffset: INTEGER\n  hospitaldischargelocation: VARCHAR(100)\n  hospitaldischargestatus: VARCHAR(10)\n  unittype: VARCHAR(50)\n  unitadmittime24: VARCHAR(8)\n  unitadmitsource: VARCHAR(100)\n  unitvisitnumber: INTEGER\n  unitstaytype: VARCHAR(15)\n  admissionweight: DECIMAL(10, 2)\n  dischargeweight: DECIMAL(10, 2)\n  unitdischargetime24: VARCHAR(8)\n  unitdischargeoffset: INTEGER\n  unitdischargelocation: VARCHAR(100)\n  unitdischargestatus: VARCHAR(10)\n  uniquepid: VARCHAR(10)\nForeign Keys:\n  hospitalid -> hospital.hospitalid",
+      "cqs": "[What is the gender distribution of patients admitted to a specific ward?]\n\nThe ontology can answer this by grouping the data based on the 'gender' and 'wardid' fields, and then counting the number of patients in each group.\n\n---\n\n[Which patients were admitted to the hospital through the emergency department?]\n\nThe ontology can answer this by filtering the data based on the 'hospitaladmitsource' field to find patients whose source is the emergency department.\n\n---\n\n[What is the average age of patients discharged from a specific hospital?]\n\nThe ontology can answer this by filtering the data based on the 'hospitalid' field, extracting the 'age' field, and calculating the average age of the patients.\n\n---\n\n[How many patients were discharged to home from a specific unit?]\n\nThe ontology can answer this by filtering the data based on the 'unittype' field and the 'unitdischargelocation' field, and then counting the number of patients discharged to home.\n\n---\n\n[What is the average length of stay in the hospital for patients admitted through a specific source?]\n\nThe ontology can answer this by filtering the data based on the 'hospitaladmitsource' field. Then, it can calculate the difference between 'hospitaldischargeoffset' and 'hospitaladmitoffset' to determine the length of stay for each patient, and then calculate the average length of stay.",
+      "chunks": {
+        "A": "Class: Patient\n  DataProperty: admissionheight -> xsd:decimal\n  DataProperty: admissionweight -> xsd:decimal\n  DataProperty: age -> xsd:integer, xsd:string\n  DataProperty: apacheadmissiondx -> xsd:string\n  DataProperty: dischargeweight -> xsd:decimal\n  DataProperty: ethnicity -> xsd:string\n  DataProperty: gender -> xsd:integer, xsd:string\n  DataProperty: hospitaladmitoffset -> xsd:integer\n  DataProperty: hospitaladmitsource -> xsd:string\n  DataProperty: hospitaladmittime24 -> xsd:date\n  DataProperty: hospitaldischargelocation -> xsd:string\n  DataProperty: hospitaldischargeoffset -> xsd:integer\n  DataProperty: hospitaldischargestatus -> xsd:string\n  DataProperty: hospitaldischargetime24 -> xsd:date\n  DataProperty: hospitaldischargeyear -> xsd:integer\n  DataProperty: patienthealthsystemstayid -> xsd:integer\n  DataProperty: uniquepid -> xsd:string\n  DataProperty: unitadmitsource -> xsd:string\n  DataProperty: unitadmittime24 -> xsd:date\n  DataProperty: unitdischargelocation -> xsd:string\n  DataProperty: unitdischargeoffset -> xsd:integer\n  DataProperty: unitdischargestatus -> xsd:string\n  DataProperty: unitdischargetime24 -> xsd:date\n  DataProperty: unitstaytype -> xsd:string\n  DataProperty: unittype -> xsd:string\n  DataProperty: unitvisitnumber -> xsd:integer\n  DataProperty: wardid -> xsd:integer\n  ObjectProperty: hasHospital -> Hospital",
+        "B": "Class: Patient\n  DataProperty: hasAdmissionHeight -> float\n  DataProperty: hasAdmissionWeight -> float\n  DataProperty: hasAge -> integer, string\n  DataProperty: hasApacheAdmissionDx -> string\n  DataProperty: hasDischargeWeight -> float\n  DataProperty: hasEthnicity -> string\n  DataProperty: hasGender -> integer, string\n  DataProperty: hasHospitalAdmitOffset -> integer\n  DataProperty: hasHospitalAdmitSource -> string\n  DataProperty: hasHospitalAdmitTime24 -> string\n  DataProperty: hasHospitalDischargeLocation -> string\n  DataProperty: hasHospitalDischargeOffset -> integer\n  DataProperty: hasHospitalDischargeStatus -> string\n  DataProperty: hasHospitalDischargeTime24 -> string\n  DataProperty: hasHospitalDischargeYear -> integer\n  DataProperty: hasPatientHealthSystemStayId -> integer\n  DataProperty: hasPatientUnitStayId -> integer\n  DataProperty: hasUniquePid -> string\n  DataProperty: hasUnitAdmitSource -> string\n  DataProperty: hasUnitAdmitTime24 -> string\n  DataProperty: hasUnitDischargeLocation -> string\n  DataProperty: hasUnitDischargeOffset -> integer\n  DataProperty: hasUnitDischargeStatus -> string\n  DataProperty: hasUnitDischargeTime24 -> string\n  DataProperty: hasUnitStayType -> string\n  DataProperty: hasUnitType -> string\n  DataProperty: hasUnitVisitNumber -> integer\n  ObjectProperty: hasHospital -> Hospital\n  ObjectProperty: hasWard -> Ward",
+        "C": "Class: Patient\n  ObjectProperty:  -> integer, Hospital  [label: \"ethnicity\"]  [comment: \"The status of unit discharge\"]",
+        "D": "Class: Patient\n  Label: Patient\n  Comment: Represents a patient in the healthcare system\n  SubClassOf: exactly 1 unitdischargeoffset\n  SubClassOf: exactly 1 dischargeweight\n  SubClassOf: exactly 1 hasHospital\n  SubClassOf: exactly 1 unitdischargestatus\n  SubClassOf: exactly 1 hospitaladmittime24\n  SubClassOf: exactly 1 hospitaladmitsource\n  SubClassOf: exactly 1 hospitaldischargelocation\n  SubClassOf: exactly 1 unitadmittime24\n  SubClassOf: exactly 1 unitvisitnumber\n  SubClassOf: exactly 1 wardid\n  SubClassOf: exactly 1 unitdischargelocation\n  SubClassOf: exactly 1 hospitaldischargetime24\n  SubClassOf: exactly 1 hospitaladmitoffset\n  SubClassOf: exactly 1 unitstaytype\n  SubClassOf: exactly 1 ethnicity\n  SubClassOf: exactly 1 unitadmitsource\n  SubClassOf: exactly 1 uniquepid\n  SubClassOf: exactly 1 admissionheight\n  SubClassOf: exactly 1 admissionweight\n  SubClassOf: exactly 1 patienthealthsystemstayid\n  SubClassOf: exactly 1 unitdischargetime24\n  SubClassOf: exactly 1 age\n  SubClassOf: exactly 1 gender\n  SubClassOf: exactly 1 hospitaldischargestatus\n  SubClassOf: exactly 1 unittype\n  SubClassOf: exactly 1 hospitaldischargeoffset\n  SubClassOf: exactly 1 apacheadmissiondx\n  SubClassOf: exactly 1 hospitaldischargeyear\n  SubClassOf: exactly 1 hasPatient\n  DataProperty: admissionheight -> decimal  [label: \"Admission Height\"]  [comment: \"The height of the patient at admission in centimeters\"]\n  DataProperty: admissionweight -> decimal  [label: \"Admission Weight\"]  [comment: \"The weight of the patient at admission in kilograms\"]\n  DataProperty: age -> string, integer  [label: \"Age\"]  [comment: \"The age of the patient\"]\n  DataProperty: apacheadmissiondx -> string  [label: \"APACHE Admission Diagnosis\"]  [comment: \"The APACHE admission diagnosis for the patient\"]\n  DataProperty: dischargeweight -> decimal  [label: \"Discharge Weight\"]  [comment: \"The weight of the patient at discharge in kilograms\"]\n  DataProperty: ethnicity -> string  [label: \"Ethnicity\"]  [comment: \"The ethnicity of the patient\"]\n  DataProperty: gender -> string, integer  [label: \"Gender\"]  [comment: \"The gender of the patient\"]\n  DataProperty: hospitaladmitoffset -> integer  [label: \"Hospital Admit Offset\"]  [comment: \"The offset of the hospital admission time\"]\n  DataProperty: hospitaladmitsource -> string  [label: \"Hospital Admit Source\"]  [comment: \"The source of the hospital admission\"]\n  DataProperty: hospitaladmittime24 -> dateTime, date  [label: \"Hospital Admit Time 24\"]  [comment: \"The time of admission to the hospital in 24-hour format\"]\n  DataProperty: hospitaldischargelocation -> string  [label: \"Hospital Discharge Location\"]  [comment: \"The location of the hospital discharge\"]\n  DataProperty: hospitaldischargeoffset -> integer  [label: \"Hospital Discharge Offset\"]  [comment: \"The offset of the hospital discharge time\"]\n  DataProperty: hospitaldischargestatus -> string  [label: \"Hospital Discharge Status\"]  [comment: \"The status of the hospital discharge\"]\n  DataProperty: hospitaldischargetime24 -> dateTime, date  [label: \"Hospital Discharge Time 24\"]  [comment: \"The time of discharge from the hospital in 24-hour format\"]\n  DataProperty: hospitaldischargeyear -> string, integer  [label: \"Hospital Discharge Year\"]  [comment: \"The year of the hospital discharge\"]\n  DataProperty: patienthealthsystemstayid -> integer  [label: \"Patient Health System Stay ID\"]  [comment: \"The unique identifier for the patient's stay in the health system\"]\n  DataProperty: uniquepid -> string  [label: \"Admission Drug has exactly one Patient\"]  [comment: \"Each admission drug has a drug dosage\"]\n  DataProperty: unitadmitsource -> string  [label: \"Unit Admit Source\"]  [comment: \"The source of the unit admission\"]\n  DataProperty: unitadmittime24 -> dateTime, date  [label: \"Unit Admit Time 24\"]  [comment: \"The time of admission to the unit in 24-hour format\"]\n  DataProperty: unitdischargelocation -> string  [label: \"Unit Discharge Location\"]  [comment: \"The location of the unit discharge\"]\n  DataProperty: unitdischargeoffset -> integer  [label: \"Unit Discharge Offset\"]  [comment: \"The offset of the unit discharge time\"]\n  DataProperty: unitdischargestatus -> string  [label: \"Unit Discharge Status\"]  [comment: \"The status of the unit discharge\"]\n  DataProperty: unitdischargetime24 -> dateTime, date  [label: \"Unit Discharge Time 24\"]  [comment: \"The time of discharge from the unit in 24-hour format\"]\n  DataProperty: unitstaytype -> string  [label: \"Unit Stay Type\"]  [comment: \"The type of stay in the unit\"]\n  DataProperty: unittype -> string  [label: \"Unit Type\"]  [comment: \"The type of unit where the patient is admitted\"]\n  DataProperty: unitvisitnumber -> integer  [label: \"Unit Visit Number\"]  [comment: \"The number of the visit to the unit\"]\n  DataProperty: wardid -> integer  [label: \"Ward ID\"]  [comment: \"The identifier for the ward where the patient is admitted\"]\n  ObjectProperty: hasHospital -> Hospital  [label: \"has Hospital\"]  [comment: \"The hospital where the patient is admitted\"]\n  ObjectProperty: has_child_pugh_stage -> ChildPughStage  [label: \"has Child-Pugh Stage\"]  [comment: \"Relates a patient to the Child-Pugh stage of liver disease.\"]\n  ObjectProperty: has_ckd_stage -> CKDStage  [label: \"has CKD stage\"]  [comment: \"The stage of chronic kidney disease\"]\n  ObjectProperty: has_connective_tissue_amount -> ConnectiveTissueAmount  [label: \"has connective tissue amount\"]  [comment: \"The amount of connective tissue\"]\n  ObjectProperty: has_diabetes_type -> DiabetesType  [label: \"has diabetes type\"]  [comment: \"The type of diabetes\"]\n  ObjectProperty: has_fat_distribution -> FatDistribution  [label: \"has fat distribution\"]  [comment: \"The distribution of fat in the body\"]\n  ObjectProperty: has_fat_morphology -> FatMorphology  [label: \"has fat morphology\"]  [comment: \"The morphology of fat\"]\n  ObjectProperty: has_fibrosis_grade -> FibrosisGrade  [label: \"has fibrosis grade\"]  [comment: \"The grade of fibrosis\"]\n  ObjectProperty: has_growth_form -> GrowthForm  [label: \"has Growth Form\"]  [comment: \"Relates a patient to the form of growth.\"]\n  ObjectProperty: has_growth_type -> GrowthType  [label: \"has Growth Type\"]  [comment: \"Relates a patient to the type of growth.\"]\n  ObjectProperty: has_liver_changes -> LiverChanges  [label: \"has Liver Changes\"]  [comment: \"Relates a patient to changes in the liver.\"]\n  ObjectProperty: has_liver_lobe_involvement -> LiverLobeInvolvement  [label: \"has liver lobe involvement\"]  [comment: \"The involvement of a liver lobe in a condition\"]\n  ObjectProperty: has_lymphatic_invasion -> LymphaticInvasion  [label: \"has Lymphatic Invasion\"]  [comment: \"Relates a patient to the presence of lymphatic invasion.\"]\n  ObjectProperty: has_measurement_method -> MeasurementMethod  [label: \"has measurement method\"]  [comment: \"The method used for measurement\"]\n  ObjectProperty: has_metastasis_timing -> MetastasisTiming  [label: \"has Metastasis Timing\"]  [comment: \"Relates a patient to the timing of metastasis.\"]\n  ObjectProperty: has_multi_resistant_pathogens -> MultiResistantPathogens  [label: \"has Multi-Resistant Pathogens\"]  [comment: \"Relates a patient to the presence of multi-resistant pathogens.\"]\n  ObjectProperty: has_pancreatic_fistula -> PancreaticFistula  [label: \"has Pancreatic Fistula\"]  [comment: \"Relates a patient to the presence of a pancreatic fistula.\"]\n  ObjectProperty: has_perineural_invasion -> PerineuralInvasion  [label: \"has Perineural Invasion\"]  [comment: \"Relates a patient to the presence of perineural invasion.\"]\n  ObjectProperty: has_postoperative_complications -> PostoperativeComplications  [label: \"has Postoperative Complications\"]  [comment: \"Relates a patient to postoperative complications.\"]\n  ObjectProperty: has_pressure_ulcer_grade -> PressureUlcerGrade  [label: \"has pressure ulcer grade\"]  [comment: \"The grade of a pressure ulcer\"]\n  ObjectProperty: has_recurrence_location -> RecurrenceLocation  [label: \"has Recurrence Location\"]  [comment: \"Relates a patient to the location of recurrence.\"]\n  ObjectProperty: has_surgical_radicality -> SurgicalRadicality  [label: \"has Surgical Radicality\"]  [comment: \"Relates a patient to the radicality of surgery.\"]\n  ObjectProperty: has_tnm_classification -> TNMClassification  [label: \"has TNM classification\"]  [comment: \"The TNM classification of a cancer\"]\n  ObjectProperty: has_tumor_grade -> TumorGrade  [label: \"has tumor grade\"]  [comment: \"The grade of a tumor\"]\n  ObjectProperty: has_tumor_type -> TumorType  [label: \"has tumor type\"]  [comment: \"The type of a tumor\"]\n  ObjectProperty: has_uicc_stage -> UICCStage  [label: \"has UICC stage\"]  [comment: \"The stage of a cancer according to the UICC classification\"]\n  ObjectProperty: has_venous_invasion -> VenousInvasion  [label: \"has venous invasion\"]  [comment: \"The invasion of a vein by a tumor\"]"
+      }
+    },
+    {
+      "table_name": "medication",
+      "database": "eicu_crd",
+      "schema": "Table: medication\nColumns:\n  medicationid: INTEGER\n  patientunitstayid: INTEGER\n  drugorderoffset: INTEGER\n  drugstartoffset: INTEGER\n  drugivadmixture: VARCHAR(6)\n  drugordercancelled: VARCHAR(6)\n  drugname: VARCHAR(220)\n  drughiclseqno: INTEGER\n  dosage: VARCHAR(60)\n  routeadmin: VARCHAR(120)\n  frequency: VARCHAR(255)\n  loadingdose: VARCHAR(120)\n  prn: VARCHAR(6)\n  drugstopoffset: INTEGER\n  gtc: INTEGER\nForeign Keys:\n  patientunitstayid -> patient.patientunitstayid",
+      "cqs": "[What is the name of the drug administered to a patient with a specific patient unit stay ID?]\n\nThe ontology would use the 'patientunitstayid' and 'drugname' columns to answer this question. By filtering the rows with the specific 'patientunitstayid', the 'drugname' column provides the name of the drug administered.\n\n---\n\n[What is the dosage and route of administration for a specific drug ordered for a patient?]\n\nThe ontology would use the 'drugname', 'dosage', and 'routeadmin' columns to answer this question. By filtering the rows with the specific 'drugname', the 'dosage' and 'routeadmin' columns provide the dosage and route of administration, respectively.\n\n---\n\n[Has a specific drug order been cancelled for a patient?]\n\nThe ontology would use the 'drugname' and 'drugordercancelled' columns to answer this question. By filtering the rows with the specific 'drugname', the 'drugordercancelled' column indicates whether the drug order has been cancelled.\n\n---\n\n[What is the start and stop time offset for a specific drug administered to a patient?]\n\nThe ontology would use the 'drugname', 'drugstartoffset', and 'drugstopoffset' columns to answer this question. By filtering the rows with the specific 'drugname', the 'drugstartoffset' and 'drugstopoffset' columns provide the start and stop time offsets, respectively.\n\n---\n\n[Which drugs have been administered as a loading dose to a patient?]\n\nThe ontology would use the 'loadingdose' and 'drugname' columns to answer this question. By filtering the rows where 'loadingdose' is not null or empty, the 'drugname' column provides the names of the drugs administered as a loading dose.",
+      "chunks": {
+        "A": "Class: Medication\n  DataProperty: dosage -> xsd:string\n  DataProperty: drughiclseqno -> xsd:integer\n  DataProperty: drugivadmixture -> xsd:string\n  DataProperty: drugname -> xsd:string\n  DataProperty: drugordercancelled -> xsd:string\n  DataProperty: drugorderoffset -> xsd:integer\n  DataProperty: drugstartoffset -> xsd:integer\n  DataProperty: drugstopoffset -> xsd:integer\n  DataProperty: frequency -> xsd:string\n  DataProperty: gtc -> xsd:integer\n  DataProperty: loadingdose -> xsd:string\n  DataProperty: prn -> xsd:string\n  DataProperty: routeadmin -> xsd:string\n  ObjectProperty: hasPatient -> Patient",
+        "B": "Class: Medication\n  DataProperty: hasDosage -> string\n  DataProperty: hasDrugHICLSeqNo -> integer\n  DataProperty: hasDrugIVAdmixture -> string\n  DataProperty: hasDrugName -> string\n  DataProperty: hasDrugOrderCancelled -> string\n  DataProperty: hasDrugOrderOffset -> integer\n  DataProperty: hasDrugStartOffset -> integer\n  DataProperty: hasDrugStopOffset -> integer\n  DataProperty: hasFrequency -> string\n  DataProperty: hasGTC -> integer\n  DataProperty: hasLoadingDose -> string\n  DataProperty: hasPRN -> string\n  DataProperty: hasRouteAdmin -> string\n  ObjectProperty: hasDrugOrder -> DrugOrder\n  ObjectProperty: hasPatientUnitStay -> PatientUnitStay",
+        "C": "Class: Medication\n  ObjectProperty: hasAdmissionDrug -> AdmissionDrug\n  ObjectProperty: hasPatientUnitStay -> PatientUnitStay, patientunitstay, Patient, patient, microlab  [label: \"hasDrugName\"]  [comment: \"Represents an allergy record in the database.\"]",
+        "D": "Class: Medication\n  Label: Medication\n  Comment: A medication prescribed to a patient, including details such as drug name, dosage, and administration route.\n  DataProperty: dosage -> string  [label: \"dosage\"]  [comment: \"The dosage of the drug.\"]\n  DataProperty: drughiclseqno -> integer  [label: \"Drug HICL Sequence Number\"]  [comment: \"The sequence number of the drug in the HICL\"]\n  DataProperty: drugivadmixture -> string  [label: \"drug IV admixture\"]  [comment: \"The IV admixture of the drug.\"]\n  DataProperty: drugname -> string  [label: \"Drug Name\"]  [comment: \"The name of the drug\"]\n  DataProperty: drugordercancelled -> string  [label: \"drug order cancelled\"]  [comment: \"Indicates if the drug order was cancelled.\"]\n  DataProperty: drugorderoffset -> integer  [label: \"drug order offset\"]  [comment: \"The offset of the drug order.\"]\n  DataProperty: drugstartoffset -> integer  [label: \"drug start offset\"]  [comment: \"The offset of the drug start.\"]\n  DataProperty: drugstopoffset -> integer  [label: \"drug stop offset\"]  [comment: \"The offset of the drug stop.\"]\n  DataProperty: frequency -> string  [label: \"frequency\"]  [comment: \"The frequency of drug administration.\"]\n  DataProperty: gtc -> integer  [label: \"GTC\"]  [comment: \"The GTC value of the medication.\"]\n  DataProperty: loadingdose -> string  [label: \"loading dose\"]  [comment: \"The loading dose of the drug.\"]\n  DataProperty: prn -> string  [label: \"PRN\"]  [comment: \"Indicates if the medication is to be taken as needed (pro re nata).\"]\n  DataProperty: routeadmin -> string  [label: \"route of administration\"]  [comment: \"The route by which the drug is administered.\"]\n  ObjectProperty: hasPatient -> Patient  [label: \"has Patient\"]  [comment: \"The patient to whom the drug was administered\"]"
+      }
+    }
+  ]
+};
+
+const DIMENSIONS = [
+  { key: "accuracy", label: "Accuracy", desc: "Classes and properties faithfully reflect the table schema and its semantics." },
+  { key: "completeness", label: "Completeness", desc: "All columns represented; annotations (rdfs:label, rdfs:comment) on every element; value encodings documented." },
+  { key: "conciseness", label: "Conciseness", desc: "No redundant elements; every class and property serves a purpose." },
+  { key: "adaptability", label: "Adaptability", desc: "SubClassOf hierarchy enables extension; alignment to external vocabularies exists." },
+  { key: "clarity", label: "Clarity", desc: "Human-readable labels and comments; abbreviated names expanded; units documented." },
+  { key: "consistency", label: "Consistency", desc: "No punning; correct property types; domain/range present; FK resolved to ObjectProperty." },
+  { key: "domain_enrichment", label: "Domain Enrichment", desc: "Annotations explain domain meaning; coded values documented; class hierarchies reflect domain; provenance present." },
+];
+
+const METHODS = ["A", "B", "C", "D"];
+let results = [];
+let currentScreen = 0;
+let expertInfo = {};
+
+// =========================================================
+// GENERATE SCREENS
+// =========================================================
+function buildScreens() {
+  const container = document.getElementById("screens-container");
+  container.innerHTML = "";
+
+  SURVEY_DATA.tables.forEach((tbl, idx) => {
+    const div = document.createElement("div");
+    div.className = "table-screen" + (idx === 0 ? " active" : "");
+    div.id = "screen-" + idx;
+
+    let methodCards = "";
+    METHODS.forEach(m => {
+      const chunk = tbl.chunks[m] || "(No data)";
+      methodCards += `
+        <div class="method-card">
+          <div class="method-header">Ontology ${m}</div>
+          <div class="method-body"><pre>${escHtml(chunk)}</pre></div>
+        </div>`;
+    });
+
+    // Scoring grid
+    let dimRows = "";
+    // Header row
+    dimRows += `<div class="dim-row">
+      <div></div>
+      <div class="method-col-header mch-a">A</div>
+      <div class="method-col-header mch-b">B</div>
+      <div class="method-col-header mch-c">C</div>
+      <div class="method-col-header mch-d">D</div>
+    </div>`;
+
+    DIMENSIONS.forEach(dim => {
+      let selects = "";
+      METHODS.forEach(m => {
+        selects += `<div><select class="score-select" id="score-${idx}-${dim.key}-${m}">
+          <option value="">—</option>
+          <option value="0">0</option><option value="1">1</option>
+          <option value="2">2</option><option value="3">3</option>
+          <option value="4">4</option><option value="5">5</option>
+        </select></div>`;
+      });
+      dimRows += `<div class="dim-row">
+        <div class="dim-label">${dim.label}<br><span class="dim-desc">${dim.desc}</span></div>
+        ${selects}
+      </div>`;
+    });
+
+    // Ranking row
+    let rankSelects = "";
+    METHODS.forEach(m => {
+      rankSelects += `<div><select class="rank-select" id="rank-${idx}-${m}">
+        <option value="">—</option>
+        <option value="1">1st</option><option value="2">2nd</option>
+        <option value="3">3rd</option><option value="4">4th</option>
+      </select></div>`;
+    });
+
+    div.innerHTML = `
+      <div style="display:inline-block;padding:4px 12px;border-radius:6px;background:var(--primary);color:white;font-size:12px;font-weight:600;margin-bottom:12px;">${tbl.database ? tbl.database.replace('_',' ').toUpperCase() : ''} — ${tbl.table_name}</div>
+      <div class="context-card">
+        <h3>📋 Table Schema</h3>
+        <pre>${escHtml(tbl.schema)}</pre>
+      </div>
+      <div class="context-card">
+        <h3>❓ Competency Questions</h3>
+        <pre>${escHtml(tbl.cqs)}</pre>
+      </div>
+      <div class="methods-grid">${methodCards}</div>
+      <div class="scoring-card">
+        <h3>Scoring (0–5 per dimension)</h3>
+        ${dimRows}
+        <hr style="margin:16px 0; border:none; border-top:1px solid var(--border);">
+        <h3>Ranking (1st = best, 4th = worst)</h3>
+        <div class="ranking-row">
+          <div class="dim-label">Overall rank</div>
+          ${rankSelects}
+        </div>
+        <hr style="margin:16px 0; border:none; border-top:1px solid var(--border);">
+        <h3>Comments (optional)</h3>
+        <textarea class="feedback-area" id="feedback-${idx}" placeholder="Any observations about these four ontology fragments..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevScreen()" ${idx === 0 ? 'style="visibility:hidden"' : ''}>← Previous</button>
+        <button class="btn btn-primary" onclick="nextScreen(${idx})">${idx === SURVEY_DATA.tables.length - 1 ? 'Finish →' : 'Next →'}</button>
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+
+  document.getElementById("n-tables").textContent = SURVEY_DATA.tables.length;
+  document.getElementById("total-idx").textContent = SURVEY_DATA.tables.length;
+}
+
+// =========================================================
+// NAVIGATION
+// =========================================================
+function startSurvey() {
+  const name = document.getElementById("expert-name").value.trim();
+  const role = document.getElementById("expert-role").value.trim();
+  const years = document.getElementById("expert-years").value.trim();
+  if (!name) { alert("Please enter your name or identifier."); return; }
+  expertInfo = { name, role, years: parseInt(years) || 0, startTime: new Date().toISOString() };
+  document.getElementById("welcome").classList.add("hidden");
+  document.getElementById("progress-section").classList.remove("hidden");
+  currentScreen = 0;
+  showScreen(0);
+}
+
+function showScreen(idx) {
+  document.querySelectorAll(".table-screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("screen-" + idx).classList.add("active");
+  document.getElementById("current-idx").textContent = idx + 1;
+  document.getElementById("current-table-name").textContent = SURVEY_DATA.tables[idx].table_name;
+  document.getElementById("current-db-name").textContent = SURVEY_DATA.tables[idx].database || "";
+  const pct = ((idx + 1) / SURVEY_DATA.tables.length) * 100;
+  document.getElementById("progress-fill").style.width = pct + "%";
+  window.scrollTo(0, 0);
+}
+
+function collectScreenData(idx) {
+  const tbl = SURVEY_DATA.tables[idx];
+  const entry = {
+    table_name: tbl.table_name,
+    database: tbl.database || "",
+    scores: {},
+    ranking: {},
+    feedback: document.getElementById("feedback-" + idx).value.trim(),
+  };
+
+  METHODS.forEach(m => {
+    entry.scores[m] = {};
+    DIMENSIONS.forEach(dim => {
+      const sel = document.getElementById("score-" + idx + "-" + dim.key + "-" + m);
+      entry.scores[m][dim.key] = sel.value === "" ? null : parseFloat(sel.value);
+    });
+    const rankSel = document.getElementById("rank-" + idx + "-" + m);
+    entry.ranking[m] = rankSel.value === "" ? null : parseInt(rankSel.value);
+  });
+
+  return entry;
+}
+
+function validateScreen(idx) {
+  const entry = collectScreenData(idx);
+  // Check all scores filled
+  for (const m of METHODS) {
+    for (const dim of DIMENSIONS) {
+      if (entry.scores[m][dim.key] === null) {
+        alert("Please score all dimensions for all methods before proceeding.");
+        return false;
+      }
+    }
+    if (entry.ranking[m] === null) {
+      alert("Please rank all methods (1st–4th) before proceeding.");
+      return false;
+    }
+  }
+  // Check ranking is valid (each rank used once)
+  const ranks = METHODS.map(m => entry.ranking[m]);
+  const unique = new Set(ranks);
+  if (unique.size !== 4 || !([1,2,3,4].every(r => unique.has(r)))) {
+    alert("Each rank (1st–4th) must be used exactly once.");
+    return false;
+  }
+  return true;
+}
+
+function nextScreen(idx) {
+  if (!validateScreen(idx)) return;
+  results[idx] = collectScreenData(idx);
+
+  if (idx < SURVEY_DATA.tables.length - 1) {
+    currentScreen = idx + 1;
+    showScreen(currentScreen);
+  } else {
+    finishSurvey();
+  }
+}
+
+function prevScreen() {
+  if (currentScreen > 0) {
+    results[currentScreen] = collectScreenData(currentScreen);
+    currentScreen--;
+    showScreen(currentScreen);
+  }
+}
+
+function finishSurvey() {
+  document.getElementById("progress-section").classList.add("hidden");
+  document.querySelectorAll(".table-screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("done-screen").classList.remove("hidden");
+  const fname = "expert_" + expertInfo.name.replace(/\s+/g, "_") + "_evaluation.json";
+  document.getElementById("filename-preview").textContent = fname;
+}
+
+function downloadResults() {
+  const output = {
+    expert: expertInfo,
+    database: SURVEY_DATA.database,
+    timestamp: new Date().toISOString(),
+    tables_evaluated: SURVEY_DATA.tables.map(t => t.table_name),
+    evaluations: results,
+  };
+  const blob = new Blob([JSON.stringify(output, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "expert_" + expertInfo.name.replace(/\s+/g, "_") + "_evaluation.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function escHtml(s) {
+  const div = document.createElement("div");
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+// =========================================================
+// INIT
+// =========================================================
+buildScreens();
+</script>
+</body>
+</html>
